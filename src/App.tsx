@@ -9,6 +9,7 @@ import "easymde/dist/easymde.min.css";
 import ContentVersionManager from './components/ContentVersionManager';
 import ThemeVersionManager from './components/ThemeVersionManager';
 import _ from 'lodash'
+import html2pdf from 'html2pdf.js'
 import initHtml from './utils/html';
 import jsx2str from 'react-element-to-jsx-string'
 import style from './index.module.scss';
@@ -64,16 +65,26 @@ export default function App() {
     setMdeInstance(mde)
   }, [theme])
 
-  const downloadPdf = () => {
+  const downloadPdf = async () => {
     const html = getContentHtml();
-    printJS({
-      type: 'raw-html',
-      css: "",
-      scanStyles: true,
-      printable: html,
-      targetStyles: ['*'],
-      documentTitle: "&nbsp"
-    });
+    const pdfBolck = document.getElementById('pdf-init')
+    if (!pdfBolck) {
+      return
+    }
+    pdfBolck.innerHTML = html;
+    pdfBolck.style.display = 'block';
+    const worker = await html2pdf().from(pdfBolck).save('resume.pdf');
+    console.log(worker)
+    console.log(pdfBolck)
+    // pdfBolck.style.display = 'none';
+    // printJS({
+    //   type: 'raw-html',
+    //   css: "",
+    //   scanStyles: true,
+    //   printable: html,
+    //   targetStyles: ['*'],
+    //   documentTitle: "&nbsp"
+    // });
   }
 
   return (

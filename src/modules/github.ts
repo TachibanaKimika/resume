@@ -2,10 +2,10 @@ export default `
 .custom {
   width: 100px;
   height: 100px;
-  color: #fdf;
+  background-color: #fdf;
 }
 
-body {
+main {
   -ms-text-size-adjust: 100%;
   -webkit-text-size-adjust: 100%;
   margin: 0;
