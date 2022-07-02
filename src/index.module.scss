@@ -1,0 +1,13 @@
+.body {
+  padding: 20px;
+}
+
+.topBar {
+  display: flex;
+  margin-top: 15px;
+  margin-bottom: 20px;
+}
+
+.editorBody {
+  height: calc(100vh - 200px);
+}

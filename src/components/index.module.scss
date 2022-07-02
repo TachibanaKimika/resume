@@ -1,0 +1,30 @@
+.managerWrap {
+  flex:1;
+  .managerLabel {
+    margin-right: 20px;
+    font-size: 18px;
+  }
+}
+
+
+.optionBody {
+  display: flex;
+  .optionLable {
+
+  }
+  .optionEdit {
+    margin-left: auto;
+  }
+  .optionDelete {
+    margin-left: auto;
+    span {
+      transition: color 0.2s ease-in-out;
+      &:not(:last-child) {
+        margin-right: 8px;
+      }
+      &:hover {
+        color: lightblue;
+      }
+    }
+  }
+}
