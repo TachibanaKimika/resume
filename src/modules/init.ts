@@ -1,10 +1,10 @@
-import * as ls from '../utils/ls'
+import * as ls from '../utils/ls';
 
-import defaultTheme from './github'
+import defaultTheme from './github';
 
 export const init = (): void => {
   if (!ls.getStyle('default')) {
-    ls.setStyle('default', defaultTheme)
+    ls.setStyle('default', defaultTheme);
   }
   if (!ls.getContent('default')) {
     ls.setContent('default', `
@@ -45,6 +45,6 @@ this is \`inline code\`
 
 
 <div class="custom">custom div<div>
-    `)
+    `);
   }
-}
+};

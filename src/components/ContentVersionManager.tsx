@@ -1,8 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react'
-import { Divider, Input, Space, Typography, Button, Select, message, Modal } from 'antd'
-import { CloseCircleOutlined } from '@ant-design/icons'
-import * as ls from '../utils/ls'
-import style from './index.module.scss'
+import React, { useState, useEffect, useRef } from 'react';
+import {
+  Divider, Input, Space, Typography, Button, Select, message, Modal,
+} from 'antd';
+import { CloseCircleOutlined } from '@ant-design/icons';
+import * as ls from '../utils/ls';
+import style from './index.module.scss';
+
 const { Option } = Select;
 
 interface IContentVersionManager {
@@ -11,7 +14,6 @@ interface IContentVersionManager {
   /** 版本变化时触发 */
   onVersionChange: (props: { version: string; content: string; }) => void;
 }
-
 
 /**
  * @description 内容版本管理器, 主应用无需感知版本号
@@ -22,68 +24,69 @@ interface IContentVersionManager {
  *   shouldVersionChange,
  *   content
  * }
- * @return {*} 
+ * @return {*}
  */
 export default function ContentVersionManager({
   onVersionChange,
-  content
+  content,
 }: IContentVersionManager) {
-  
-  const [curVer, setCurVer] = useState('default')
-  const [verList, setVerList] = useState<string[]>(ls.getAllContentKeys())
-  const verInputRef = useRef<any>(null)
+  const [curVer, setCurVer] = useState('default');
+  const [verList, setVerList] = useState<string[]>(ls.getAllContentKeys() || ['default']);
+  const verInputRef = useRef<any>(null);
 
   useEffect(() => {
-    const content = ls.getContent(curVer)
-    console.log('v:', curVer, 'c', content)
-    setVerList(ls.getAllContentKeys())
-    onVersionChange({ version: curVer, content })
-  }, [curVer])
+    const content = ls.getContent(curVer);
+    console.log('v:', curVer, 'c', content);
+    setVerList(ls.getAllContentKeys());
+    onVersionChange({ version: curVer, content });
+  }, [curVer]);
 
   const addVersion = (newVersion: string) => {
     if (verList.includes(newVersion)) {
-      message.info('can not add same version')
-      return
+      message.info('can not add same version');
+      return;
     }
-    ls.setContent(newVersion, content)
-    setVerList([...verList, newVersion])
-  }
+    ls.setContent(newVersion, content);
+    setVerList([...verList, newVersion]);
+  };
 
   const switchVersion = (newVersion: string) => {
-    ls.setContent(curVer, content)
-    setCurVer(newVersion)
-  }
+    ls.setContent(curVer, content);
+    setCurVer(newVersion);
+  };
 
   const deleteVersion = (e: React.MouseEvent, version: string) => {
-    e.stopPropagation()
+    e.stopPropagation();
     Modal.confirm({
       title: 'do you want to delete this version?',
       content: `version: ${version}`,
       onOk: () => {
-        ls.deleteContent(version)
-        message.success('delete success')
-        setVerList(ls.getAllContentKeys())
-      }
-    })
-  }
+        ls.deleteContent(version);
+        message.success('delete success');
+        setVerList(ls.getAllContentKeys());
+      },
+    });
+  };
 
   return (
     <div className={style.managerWrap}>
       <span className={style.managerLabel}>Resume Version:</span>
       <Select
         style={{ width: 300 }}
-        placeholder="custom dropdown render"
-        dropdownRender={menu => (
+        placeholder='custom dropdown render'
+        dropdownRender={(menu) => (
           <>
             {menu}
             <Divider style={{ margin: '8px 0' }} />
-            <Space align="center" style={{ padding: '0 8px 4px' }}>
-              <Input placeholder="Please enter item" ref={verInputRef} />
-              <Typography.Link onClick={() => {
-                  verInputRef?.current?.input &&
-                  addVersion(verInputRef.current.input.value)
+            <Space align='center' style={{ padding: '0 8px 4px' }}>
+              <Input placeholder='Please enter item' ref={verInputRef} />
+              <Typography.Link
+                onClick={() => {
+                  verInputRef?.current?.input
+                  && addVersion(verInputRef.current.input.value);
                 }}
-                style={{ whiteSpace: 'nowrap' }}>
+                style={{ whiteSpace: 'nowrap' }}
+              >
                 Add item
               </Typography.Link>
             </Space>
@@ -96,7 +99,7 @@ export default function ContentVersionManager({
           <Option key={item}>
             <div className={style.optionBody}>
               <div className={style.optionLable}>{item}</div>
-              {curVer !== item && item!=='default' && (
+              {curVer !== item && item !== 'default' && (
                 <div className={style.optionDelete}>
                   <CloseCircleOutlined onClick={(e) => deleteVersion(e, item)} />
                 </div>
@@ -106,5 +109,5 @@ export default function ContentVersionManager({
         ))}
       </Select>
     </div>
-  )
+  );
 }

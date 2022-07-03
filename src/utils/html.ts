@@ -9,13 +9,11 @@ ${html}
 `;
 }
 
-export const renderPreview = (html: string, css: string) => {
-  return `
+export const renderPreview = (html: string, css: string) => `
 <div>
   <style type="text/css">
     ${css}
   </style>
   ${html}
 </div>
-  `
-}
+  `;
