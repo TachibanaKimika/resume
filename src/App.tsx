@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
-import { Button, Spin } from 'antd'
+import { Button, Spin, Dropdown, Menu } from 'antd'
 import * as ls from './utils/ls'
 import { init } from './modules/init'
 import printJS from 'print-js';
-// import download from 'js-file-download';
+import download from 'js-file-download';
 import SimpleMDE from "react-simplemde-editor";
 import "easymde/dist/easymde.min.css";
 import ContentVersionManager from './components/ContentVersionManager';
@@ -13,7 +13,7 @@ import html2pdf from 'html2pdf.js'
 import initHtml from './utils/html';
 import jsx2str from 'react-element-to-jsx-string'
 import style from './index.module.scss';
-import { marked } from 'marked';
+import marked from './utils/marked';
 export default function App() {
   const [content, setContent] = useState('')
   const [version, setVersion] = useState('default')
@@ -73,31 +73,72 @@ export default function App() {
     }
     pdfBolck.innerHTML = html;
     pdfBolck.style.display = 'block';
-    const worker = await html2pdf().from(pdfBolck).save('resume.pdf');
-    console.log(worker)
-    console.log(pdfBolck)
-    // pdfBolck.style.display = 'none';
-    // printJS({
-    //   type: 'raw-html',
-    //   css: "",
-    //   scanStyles: true,
-    //   printable: html,
-    //   targetStyles: ['*'],
-    //   documentTitle: "&nbsp"
-    // });
+    const worker = await html2pdf().set({
+      html2canvas: {
+        allowTaint : false,
+        useCORS: true,
+        dpi: 1600,
+      },
+    }).from(pdfBolck).save('resume.pdf');
+    console.log('success', worker)
+    pdfBolck.style.display = 'none';
   }
+
+  const printPdf = async () => {
+    const html = getContentHtml();
+    printJS({
+      type: 'raw-html',
+      css: "",
+      scanStyles: true,
+      printable: html,
+      targetStyles: ['*'],
+      documentTitle: "&nbsp"
+    });
+  }
+
+  const downloadEvent = ({ key }: { key: string }) => {
+    switch (key) {
+      case 'printjs': printPdf(); break;
+      case 'canvans': downloadPdf(); break;
+      case 'markdown': download(content, 'resume.md'); break;
+    }
+  }
+
+  const downloadMenu = (
+    <Menu
+      items={[{
+        label: 'download pdf (printjs)',
+        key: 'printjs',
+      }, {
+        label: 'download pdf (html2canvans)',
+        key: 'canvans',
+      }, {
+        label: 'download markdown',
+        key: 'markdown',
+      }]}
+      onClick={downloadEvent}
+    />
+  )
 
   return (
     <div className={style.body}>
       <div className={style.topBar}>
         <ContentVersionManager content={content} onVersionChange={contentVersionChange} />
         <ThemeVersionManager theme={theme} onVersionChange={themeVersionChange} />
-        <Button onClick={downloadPdf}>download pdf</Button>
+      </div>
+      <div className={style.buttons}>
+        <Dropdown.Button
+          overlay={downloadMenu}
+          onClick={downloadPdf}
+          type="primary"
+        >
+          Download pdf
+        </Dropdown.Button>
       </div>
       <div className={style.editorBody}>
         <SimpleMDE
           value={content}
-          onChange={_.debounce(setContent, 1000)}
+          onChange={setContent}
           getMdeInstance={getMdeInstanceCallback}
         />
       </div>

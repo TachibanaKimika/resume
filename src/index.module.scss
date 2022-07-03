@@ -5,7 +5,19 @@
 .topBar {
   display: flex;
   margin-top: 15px;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
+}
+
+.buttons {
+  margin-bottom: 15px;
+  &>button:global {
+    margin-right: 10px;
+  }
+  :global {
+    .ant-dropdown-button {
+      margin-right: 10px;
+    }
+  }
 }
 
 .editorBody {
