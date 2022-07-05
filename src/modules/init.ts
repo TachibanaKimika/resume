@@ -16,7 +16,15 @@ export const init = (): void => {
   display: flex;
 }
 </style>
-^ ### Left Block ^ right *block*
+
+$flex-start
+$flex-child-start-2
+FLEX_2
+$flex-child-end-2
+$flex-child-start-1
+FLEX_1
+$flex-child-end-1
+$flex-end
 
 # h1
 ## h2

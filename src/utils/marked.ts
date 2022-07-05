@@ -1,60 +1,63 @@
 import { marked } from 'marked';
 
-const flexBlock: any = {
-  name: 'flexBlock',
+const flexBox: any = {
+  name: 'flexWarp',
   level: 'block',
   start(src: string) {
-    return src.match(/\^/)?.index;
+    return src?.match(/\$flex-start/)?.index;
   },
   tokenizer(src: string) {
-    const rule = /^\^([^\^\n]+)\^([^\^\n]*)(?:\n|$)/;
+    const rule = /^(\$flex-start((\n|.))+(\$flex-end))/;
     const match = rule.exec(src);
     if (match) {
-      const token = { // Token to generate
-        type: 'flexBlock', // Should match "name" above
-        raw: match[0], // Text to consume from the source
-        text: match[0].trim(), // Additional custom properties
-        tokens: [], // Array where child inline tokens will be generated
+      const text = match?.[0]?.replace(/^\$flex\-start/, '')?.replace(/\$flex\-end$/, '');
+      const tokens = this.lexer.blockTokens(text);
+      return {
+        type: 'flexWarp',
+        raw: match[0],
+        text,
+        tokens,
       };
-      this.lexer.inline(token.text, token.tokens);
-      return token;
     }
   },
   renderer(token: any) {
-    console.log('flex-block', token);
-    return `<div class="flex-parent" style="display: flex">${this.parser.parse(token.tokens)}</div>`;
+    return `<div style="display: flex">${this.parser.parse(token.tokens)}</div>`;
   },
 };
 
-const flexContent: any = {
+const flexChild: any = {
   name: 'flexChild',
-  level: 'inline', // Is this a block-level or inline-level tokenizer?
-  start(src: string) { return src.match(/\^/)?.index; }, // Hint to Marked.js to stop and check for a match
+  level: 'block',
+  start(src: string) {
+    return src?.match(/\$flex-child-start-\d/)?.index;
+  },
   tokenizer(src: string) {
-    const rule = /^\^([^^\n]+)\^([^^\n]*)(?:\n|$)/; // Regex for the complete token, anchor to string start
+    const flexNum = src?.match(/\$flex\-child\-start\-\d/)?.[0]?.replace(/\$flex\-child\-start\-/, '');
+    const rule = new RegExp(`^(\\$flex\\-child\\-start\\-${flexNum}((\\n|.))+(\\$flex\\-child\\-end\\-${flexNum}))`);
+    const startRuleStr = `^\\$flex\\-child\\-start-${flexNum}`; const
+      endRuleStr = `\\$flex\\-child\\-end\\-${flexNum}$`;
     const match = rule.exec(src);
     if (match) {
-      return { // Token to generate
-        type: 'flexChild', // Should match "name" above
-        raw: match[0], // Text to consume from the source
-        left: this.lexer.blockTokens(match[1].trim()), // Additional custom properties, including
-        right: this.lexer.blockTokens(match[2].trim()), //   any further-nested inline tokens
+      const statementKeyword = ['right', 'left', 'center'];
+      const statementsMatch = src?.match(new RegExp(`(?<=(${startRuleStr}:)).*`))?.[0]?.split('&');
+      const style = statementsMatch?.map((statement: string) => (statementKeyword.includes(statement) ? `align-items: ${statement};text-align: ${statement};` : statement));
+      const text = match?.[0]?.replace(new RegExp(`${startRuleStr}.*`), '')?.replace(new RegExp(`.*${endRuleStr}`), '');
+      const tokens = this.lexer.blockTokens(text);
+      return {
+        type: 'flexChild',
+        raw: match[0],
+        level: flexNum,
+        style,
+        text,
+        tokens,
       };
     }
   },
   renderer(token: any) {
-    console.log('flexchild', token, this.parser.parse(token?.left));
-    return `
-    <div class="flex-left" style="text-align: left;">
-      ${this.parser.parse(token?.left)}
-    </div>
-    <div class="flex-right" style="text-align: right; margin-left: auto">
-      ${this.parser.parse(token?.right)}
-    </div>`;
+    return `<div style="flex: ${token?.level};${token?.style?.join(';')}">${this.parser.parse(token.tokens)}</div>`;
   },
-  childTokens: ['left', 'right'], // Any child tokens to be visited by walkTokens
 };
 
-marked.use({ extensions: [flexBlock, flexContent] });
+marked.use({ extensions: [flexBox, flexChild] });
 
 export default marked;
