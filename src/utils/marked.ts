@@ -7,7 +7,7 @@ const flexBox: any = {
     return src?.match(/\$flex-start/)?.index;
   },
   tokenizer(src: string) {
-    const rule = /^(\$flex-start((\n|.))+(\$flex-end))/;
+    const rule = /^(\$flex-start((\n|.))+?(\$flex-end))/;
     const match = rule.exec(src);
     if (match) {
       const text = match?.[0]?.replace(/^\$flex\-start/, '')?.replace(/\$flex\-end$/, '');
@@ -33,7 +33,7 @@ const flexChild: any = {
   },
   tokenizer(src: string) {
     const flexNum = src?.match(/\$flex\-child\-start\-\d/)?.[0]?.replace(/\$flex\-child\-start\-/, '');
-    const rule = new RegExp(`^(\\$flex\\-child\\-start\\-${flexNum}((\\n|.))+(\\$flex\\-child\\-end\\-${flexNum}))`);
+    const rule = new RegExp(`^(\\$flex\\-child\\-start\\-${flexNum}((\\n|.))+?(\\$flex\\-child\\-end\\-${flexNum}))`);
     const startRuleStr = `^\\$flex\\-child\\-start-${flexNum}`; const
       endRuleStr = `\\$flex\\-child\\-end\\-${flexNum}$`;
     const match = rule.exec(src);
