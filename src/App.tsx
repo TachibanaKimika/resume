@@ -86,6 +86,7 @@ export default function App() {
     pdfBolck.innerHTML = html;
     pdfBolck.style.display = 'block';
     const worker = await html2pdf().set({
+      margin: [10, 0, 10, 0],
       html2canvas: {
         allowTaint: false,
         useCORS: true,
